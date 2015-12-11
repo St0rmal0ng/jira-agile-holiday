@@ -1,5 +1,5 @@
 {
 	"jiraurl": "https://jira.yourcompany.com",
-	"boardids": ["1", "2", "3"],
+	"board_ids": ["1", "2", "3"],
 	"holidays": ["2015-12-24", "2015-12-25"]
 }

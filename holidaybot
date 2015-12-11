@@ -63,7 +63,7 @@ my $client = REST::Client->new();
 
 #Update the boards
 #For each board for each day
-for my $board (@{$config->{boardids}}) {
+for my $board (@{$config->{board_ids}}) {
 	for my $day (@{$config->{holidays}}) {
 		update_board($board, $day);
 	}
@@ -80,7 +80,7 @@ sub update_board($$) {
 
 	my %hash = ('rapidViewId' => $boardId, 'iso8601Date' => $date);
 	my $json = encode_json(\%hash);
-	
+
 	printf "Adding [%s] to board [%s]...\n", $date, $boardId;
 
 	$client->addHeader('Authorization', "Basic $cred");
