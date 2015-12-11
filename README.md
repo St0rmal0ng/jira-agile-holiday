@@ -87,7 +87,9 @@ The board_ids property is an array of the numerical IDs assigned to the boards
 you want to update. This can be determined by navigating to the board 
 in JIRA and looking at the "rapidView" property in the URL.
 
-https://jira.yourcompany.com/secure/RapidBoard.jspa?rapidView=<b>6</b>&quickFilter=108
+```
+https://jira.yourcompany.com/secure/RapidBoard.jspa?rapidView=6
+```
 
 Example:
 ```
