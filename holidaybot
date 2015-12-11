@@ -1,0 +1,92 @@
+#!/usr/bin/perl
+#
+# HolidayBot : Automated maintenance of Jira non-working days.
+# Version 1.0
+# Copyright Mike Enright
+# Inspired by LabelBot by Andrew Culver
+# 
+# Run with --help option for usage.
+
+#curl -D- -u USER:PASSWORD -X POST -d '{ "rapidViewId" : "6", "iso8601Date" : "2015-12-24" }' -H "Content-Type: application/json" http://JIRA_URL/rest/greenhopper/latest/rapidviewconfig/workingdays/nonworkingday/add
+
+use Getopt::Long;
+
+# Options
+my $configfile = './config.json';
+my $credfile = './holidaybot.cred';
+my $mkcred;
+my $help = 0;
+my $opt = GetOptions(	
+			"rules=s"	=> \$configfile,
+			"cred=s"	=> \$credfile,
+			"mkcred=s"	=> \$mkcred,
+			"help"		=> \$help);
+
+# Help
+if ($help) {
+	print "Usage: holidaybot [options]\n\n";
+	print "Options:\n";
+	print "\t--config=file    Specify a config file (default=./config.json).\n";
+	print "\t--cred=file      Specify a credentials file (default=./holidaybot.cred).\n";
+	print "\t--mkcred=creds   Converts credentials to base64 format for credentials file.\n";
+	print "\t                 Example: --mkcred=username:password\n";
+	print "\t                 (Note: This is NOT encrypted. Protect your cred file.\n";
+	print "\t--help           Output this usage.\n";
+	exit;
+}
+
+use REST::Client;
+use JSON;
+
+# Generate credentials
+if (defined($mkcred)) {
+	use MIME::Base64;
+	print encode_base64($mkcred);
+	exit;
+}
+
+# Load config file
+local $/;
+open(my $configfh, '<', $configfile);
+my $configtxt = <$configfh>;
+my $config = decode_json($configtxt);
+close($configfh);
+
+# Load credentials file
+open(my $credfh, '<', $credfile);
+my $cred = <$credfh>;
+chop $cred;
+close($credfh);
+
+#HTTP Client
+my $client = REST::Client->new();
+
+#Update the boards
+#For each board for each day
+for my $board (@{$config->{boardids}}) {
+	for my $day (@{$config->{holidays}}) {
+		update_board($board, $day);
+	}
+}
+
+#
+# Subroutines
+#
+
+#Update board
+sub update_board($$) {
+	my $boardId = shift;
+	my $date = shift;
+
+	my %hash = ('rapidViewId' => $boardId, 'iso8601Date' => $date);
+	my $json = encode_json(\%hash);
+	
+	printf "Adding [%s] to board [%s]...\n", $date, $boardId;
+
+	$client->addHeader('Authorization', "Basic $cred");
+	$client->POST($config->{jiraurl}.'/rest/greenhopper/latest/rapidviewconfig/workingdays/nonworkingday/add',
+		$json,
+		{"Content-Type"=>"application/json"});
+
+	printf "Response: [%s] %s\n", $client->responseCode(), $client->responseContent();
+}

@@ -1,3 +1,2 @@
-holiday.cred
-rules.*.json
-logs/*
+*.cred
+*.json
