@@ -1,6 +1,6 @@
 # jira-agile-holiday
 
-Holiday removes some of the tedium of updating the non-working days on your JIRA Agile boards.
+Holiday Bot removes some of the tedium of updating the non-working days on your JIRA Agile boards.
 
 ##	Requirements
 
@@ -17,7 +17,7 @@ Usage: holidaybot [options]
 
 Options:
 
-	--config=file    Specify a rules file (default=./config.json).
+	--config=file    Specify a config file (default=./config.json).
 	--cred=file      Specify a credentials file (default=./holiday.cred).
 	--mkcred=creds   Converts credentials to base64 format for credentials file.
 	                 Example: --mkcred=username:password
